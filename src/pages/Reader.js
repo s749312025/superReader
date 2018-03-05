@@ -133,7 +133,7 @@ class Reader extends Component {
 				{this.state.isHasMenu ? null : <Test bookid={this.state.params._id} save={this.saveMenu} />}
 				{this.state.initContent ? 
 					<ReadContent
-						initContent={this.state.initContent}
+						initContent={{ initContent: this.state.initContent, mark: this.state.mark}}
 						mark={this.state.mark}
 						getContent={this.getContent} /> : null}
 			</View>

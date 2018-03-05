@@ -56,7 +56,7 @@ class BookList extends Component {
 								<Body>
 									<Text>{item.title}</Text>
 									<Text note style={[styles.mt10, styles.note]}>{item.author} | {item.majorCate ? item.majorCate : item.cat}</Text>
-									<Text note style={[styles.mt10, styles.note, styles.intro]}>{item.shortIntro}</Text>
+									<Text note numberOfLines={2} style={[styles.mt10, styles.note, styles.intro]}>{item.shortIntro}</Text>
 									<Text note style={[styles.mt10, styles.tip]}>追书人:{item.latelyFollower}    留存率:{item.retentionRatio}%</Text>
 								</Body>
 							</ListItem>
@@ -79,7 +79,7 @@ const styles = StyleSheet.create({
 		fontWeight: 'normal',
 	},
 	intro: {
-		maxHeight: 25,
+		//maxHeight: 25,
 		overflow: 'hidden',
 	},
 	tip: {
