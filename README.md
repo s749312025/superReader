@@ -10,8 +10,11 @@ ___
 ___
 ## 安装
 git clone https://github.com/s749312025/superReader.git
+
 cd superReader
+
 yarn
+
 react-native run-ios / react-native run-android
 ___
 ## 截图
