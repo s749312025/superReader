@@ -3,6 +3,8 @@ import { View, FlatList, Button, Alert, StyleSheet, Image, DeviceEventEmitter } 
 import { Container, Content, List, ListItem, Left, Right, Text, Body } from 'native-base';
 import { withNavigation } from 'react-navigation';
 import Icon from 'react-native-vector-icons/FontAwesome';
+import RNFS from 'react-native-fs';
+var publicFilePath = RNFS.DocumentDirectoryPath;
 import moment from 'moment';
 import 'moment/locale/zh-cn'
 
@@ -35,7 +37,7 @@ class BookShelf extends React.Component {
 		});
 	}
 	deleteBook = (item) => {
-		var confirm = (id) => {
+		var confirm = async (id) => {
 			this.setState({ isAllowScroll: true })
 			Storage.remove({
 				key: 'books',
@@ -46,6 +48,13 @@ class BookShelf extends React.Component {
 				id,
 			})
 			this.getBooks()
+			return RNFS.unlink(publicFilePath + `/superReader/${id}`)
+			.then(() => {
+				console.log('FILE DELETED');
+			})
+			.catch((err) => {
+				console.log(err.message);
+			});
 		}
 		Alert.alert('删除', `是否删除书本 《${item.title}》`,
 			[

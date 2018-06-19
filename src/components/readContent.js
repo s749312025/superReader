@@ -9,10 +9,10 @@ class ReadContent extends Component {
 	constructor(props) {
 		super(props);
 		this.state = {
-			mark: {
-				index: 0,
-				markContent: ""
-			},
+			// mark: {
+			// 	index: 0,
+			// 	markContent: ""
+			// },
 			initHeight: {maxHeight: 0},
 			thisContent: "",
 			getHeightText: "",
@@ -31,17 +31,19 @@ class ReadContent extends Component {
 	}
 	componentDidMount() {
 		this.initHeight()
-		this.readTxt(this.props.initContent.initContent)
+		this.initReadTxt(this.props.initContent.mark)
+		// this.initReadTxt(this.props.initContent.initContent)
 	}
-	readTxt = async (path) => {
-		console.log(path);
-		let content = await RNFS.readFile(path)
-		// console.log(content);
+	initReadTxt = async (mark) => {
+		let content = await this.props.getContent(mark.index) 
 		this.setState({ thisContent: content})
 		this.setState({ getHeightText: content})
+		// console.log(path);
+		// let content = await RNFS.readFile(path)
+		// this.setState({ thisContent: content})
+		// this.setState({ getHeightText: content})
 	}
 	textOnLayout=(e) => {
-		// console.log({height, width});
 		console.log(e.nativeEvent.layout)
 	}
 	_textOnLayout = (e) => {
@@ -54,14 +56,10 @@ class ReadContent extends Component {
 			}
 			this.setState({thisPage: page})
 		}
-		setTimeout(() => {
-			page.push(52)
-			this.setState({thisPage: page})
-			console.log('ok');
-		}, 10000);
 		console.log(e.nativeEvent.layout)
 	}
 	initHeight = () => {
+		console.log(this.props.config[2]);
 		let num = Math.floor((height - 50) / linHeights[this.props.config[2]])
 		this.setState({initHeight: {maxHeight: num * linHeights[this.props.config[2]]}})
 	}

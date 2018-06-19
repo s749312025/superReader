@@ -67,7 +67,6 @@ class Reader extends Component {
 			this.setState({
 				menuList: res,
 			})
-			console.log(this.state)
 			this.gotoRead()
 		})
 		.catch(err => {
@@ -77,33 +76,40 @@ class Reader extends Component {
 		})
 	}
 	getContent = async (index) => {
-		let path = await this.getContentSave(this.state.params._id, this.state.mark.index)
+		let path = await this.getContentSave(this.state.params._id, index)
 		return path
 	}
 	gotoRead = async () => {
 		let { config } = await Storage.load({key: 'readConfig'})
-		let initContent = await this.getContentSave(this.state.params._id, this.state.mark.index)
-		console.log(initContent);
+		//let initContent = await this.getContentSave(this.state.params._id, this.state.mark.index)
+		//console.log(initContent);
 		this.setState({ config })
-		this.setState({ initContent })
+		//this.setState({ initContent })
 	}
 	getContentSave = async (id, index) => {
-		if (this.state.menuList.chapters[index].content) {
-			return this.state.menuList.chapters[index].content
+		if(this.state.menuList.chapters[index].content) {
+			try {
+				let content = await await RNFS.readFile(this.state.menuList.chapters[index].content)
+				return content
+			} catch (error) {
+				let menuCache = {...this.state.menuList}
+				menuCache.chapters[index].content = null
+				this.setState({ menuList: menuCache})
+				this.getContentSave(id, index)
+			}
 		}
+		// if (this.state.menuList.chapters[index].content) {
+		// 	return this.state.menuList.chapters[index].content
+		// }
 		let url = this.state.menuList.chapters[index].link
-		console.log(new Date().getTime());
 		let list = await fetch("https://chapterup.zhuishushenqi.com/chapter/" + url)
 		let listJson = await list.json()
-		console.log(listJson);
 		try {
 			await RNFS.writeFile(publicFilePath + `/superReader/${id}/${index}.txt`, listJson.chapter.cpContent, 'utf8')
 		} catch (error) {
 			await RNFS.mkdir(publicFilePath + `/superReader/${id}/test.txt`, { NSURLIsExcludedFromBackupKey: true})
 			await RNFS.writeFile(publicFilePath + `/superReader/${id}/${index}.txt`, listJson.chapter.cpContent, 'utf8')
 		}
-		console.log(new Date().getTime());
-		//let read = await RNFS.readFile(publicFilePath + `/superReader/${id}/${index}.txt`)
 		let path = publicFilePath + `/superReader/${id}/${index}.txt`
 		let menuCache = this.state.menuList
 		menuCache.chapters[index].content = path
@@ -114,7 +120,7 @@ class Reader extends Component {
 			data: menuCache,
 			expires: null
 		})
-		return path
+		return listJson.chapter.cpContent
 	}
 	mkdirNewFile = async (path) => {
 		const options = {
@@ -134,9 +140,9 @@ class Reader extends Component {
 			<View style={{flex:1}}>
 				<StatusBar hidden={true}/>
 				{this.state.isHasMenu ? null : <Test bookid={this.state.params._id} save={this.saveMenu} />}
-				{this.state.initContent ? 
+				{this.state.menuList.chapters &&  this.state.config.length > 0? 
 					<ReadContent
-						initContent={{ initContent: this.state.initContent, mark: this.state.mark}}
+						initContent={{ mark: this.state.mark}}
 						mark={this.state.mark}
 						config={this.state.config}
 						getContent={this.getContent} /> : null}
