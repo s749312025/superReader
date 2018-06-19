@@ -13,6 +13,8 @@ import './Storage';
 import TabNavigator from './tabNav'
 import Home from './Home';
 
+import RNFS from 'react-native-fs';
+
 import {
 	View,
 	Text,

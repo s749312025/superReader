@@ -18,6 +18,7 @@ class Reader extends Component {
 			params,
 			initContent: "",
 			isHasMenu: true,
+			config: [],
 			menuList: {},
 			mark: {index: 0, markContent: ""}
 		}
@@ -80,8 +81,10 @@ class Reader extends Component {
 		return path
 	}
 	gotoRead = async () => {
+		let { config } = await Storage.load({key: 'readConfig'})
 		let initContent = await this.getContentSave(this.state.params._id, this.state.mark.index)
 		console.log(initContent);
+		this.setState({ config })
 		this.setState({ initContent })
 	}
 	getContentSave = async (id, index) => {
@@ -135,6 +138,7 @@ class Reader extends Component {
 					<ReadContent
 						initContent={{ initContent: this.state.initContent, mark: this.state.mark}}
 						mark={this.state.mark}
+						config={this.state.config}
 						getContent={this.getContent} /> : null}
 			</View>
 		);

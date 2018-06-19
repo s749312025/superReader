@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import { View, Text, StyleSheet, Dimensions } from 'react-native';
 import RNFS from 'react-native-fs';
 import Swiper from 'react-native-swiper';
+import { backgroundColors, fontSizes, linHeights } from './readConfig';
 var { height, width } = Dimensions.get('window');
 
 class ReadContent extends Component {
@@ -12,38 +13,81 @@ class ReadContent extends Component {
 				index: 0,
 				markContent: ""
 			},
+			initHeight: {maxHeight: 0},
 			thisContent: "",
+			getHeightText: "",
+			thisPage: [],
 			thisIndex: null,
+			ViewStyle: {
+				backgroundColor: backgroundColors[props.config[0]],
+			},
+			textStyle: {
+				includeFontPadding: false,
+				fontFamily: 'Cochin',
+				fontSize: fontSizes[props.config[1]],
+				lineHeight: linHeights[props.config[2]]
+			}
 		}
 	}
 	componentDidMount() {
-		let lineWidth = Math.floor((width - 40) * 2 / 18);
-		console.log({ lineWidth, width});
+		this.initHeight()
 		this.readTxt(this.props.initContent.initContent)
 	}
 	readTxt = async (path) => {
 		console.log(path);
 		let content = await RNFS.readFile(path)
-		console.log(content);
+		// console.log(content);
 		this.setState({ thisContent: content})
+		this.setState({ getHeightText: content})
 	}
 	textOnLayout=(e) => {
+		// console.log({height, width});
 		console.log(e.nativeEvent.layout)
 	}
 	_textOnLayout = (e) => {
+		let page = []
+		if(this.state.initHeight.maxHeight) {
+			console.log(e.nativeEvent.layout.height, this.state.initHeight.maxHeight);
+			thisPageTotal = Math.ceil(e.nativeEvent.layout.height / this.state.initHeight.maxHeight)
+			for (let index = 0; index < thisPageTotal; index++) {
+				page[index] = this.state.initHeight.maxHeight * index
+			}
+			this.setState({thisPage: page})
+		}
+		setTimeout(() => {
+			page.push(52)
+			this.setState({thisPage: page})
+			console.log('ok');
+		}, 10000);
 		console.log(e.nativeEvent.layout)
+	}
+	initHeight = () => {
+		let num = Math.floor((height - 50) / linHeights[this.props.config[2]])
+		this.setState({initHeight: {maxHeight: num * linHeights[this.props.config[2]]}})
 	}
 	
 	render() {
 		return (
-			<View style={{flex: 1, backgroundColor: "#fff"}}>
-				<Text style={[styles.readTextConfig, { position: "absolute" }]} onLayout={this._textOnLayout}>{this.state.thisContent}</Text>
-				<Text style={styles.readTextConfig} onLayout={this.textOnLayout}>{this.state.thisContent}</Text>
-				{/* <Swiper style={styles.backgroundColor}>
-					<View style={styles.backgroundColor}><Text style={styles.backgroundColor}>123</Text></View>
-					<View><Text>456</Text></View>
-					<View><Text>789</Text></View>
-				</Swiper> */}
+			<View style={{flex: 1}}>
+				{ this.state.thisContent && this.state.thisPage.length > 0 ? 
+				<Swiper>
+					{	
+						this.state.thisPage.map((item, index) => 
+							<View key={index} style={[styles.View, this.state.ViewStyle]}>
+								<View style={[styles.TextView, this.state.initHeight]}>
+									<Text allowFontScaling={false} style={[this.state.textStyle, {marginTop: -item}]} >{this.state.thisContent}</Text>
+								</View>
+							</View>
+						)
+					}
+				</Swiper> : null }
+				{
+					this.state.getHeightText ? 
+						<Text allowFontScaling={false} style={[{position: 'absolute', top: 20000, paddingLeft: 10}, this.state.textStyle]} 
+						onLayout={this._textOnLayout}>{this.state.getHeightText}</Text>
+						: null
+				}
+				
 			</View>
 		);
 	}
@@ -52,12 +96,18 @@ class ReadContent extends Component {
 export default ReadContent;
 
 const styles = StyleSheet.create({
-	readBackground: {
-		backgroundColor: "#cfbfae",
-		flex: 1
+	View: {
+		flex: 1,
+		paddingTop: 20,
+		paddingBottom: 30,
+		paddingLeft: 10,
 	},
-	readTextConfig: {
-		fontSize: 18,
-		lineHeight: 24
+	TextView: {
+		overflow: 'hidden'
+	},
+	text: {
+		// maxHeight: height-50,
+		// marginTop: -(height-50),
+		// overflow: 'hidden'
 	}
 });

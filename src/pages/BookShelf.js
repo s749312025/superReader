@@ -41,6 +41,10 @@ class BookShelf extends React.Component {
 				key: 'books',
 				id,
 			})
+			Storage.remove({
+				key: 'bookList',
+				id,
+			})
 			this.getBooks()
 		}
 		Alert.alert('删除', `是否删除书本 《${item.title}》`,

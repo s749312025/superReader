@@ -48,6 +48,28 @@ const Nav =  StackNavigator({
 });
 
 class Home extends Component {
+	componentDidMount() {
+		// Storage.save({
+		// 	key: 'readConfig',
+		// 	data: {
+		// 		config: [1, 1, 2]
+		// 	}
+		// })
+		Storage.load({
+			key: 'readConfig'
+		}).then(res => {
+			console.log(res);
+		}).catch(err => {
+			if(err.name = '"NotFoundError"') {
+				Storage.save({
+					key: 'readConfig',
+					data: {
+						config: [1, 1, 2]
+					}
+				})
+			}
+		})
+	}
 	render() {
 		return (
 			<Nav />
